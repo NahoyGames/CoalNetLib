@@ -5,7 +5,7 @@ namespace CoalNetLib
     public class CoalServer
     {
         private UdpClient _socket;
-        //private 
+        private FurnaceSerializer _serializer;
         
         /// <summary>
         /// Create a new instance of the coal server

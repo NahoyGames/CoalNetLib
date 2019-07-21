@@ -1,0 +1,3 @@
+[submodule "FurnaceSerializer"]
+	path = FurnaceSerializer
+	url = https://github.com/NahoyGames/FurnaceSerializer.git
