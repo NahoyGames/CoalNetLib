@@ -1,18 +1,15 @@
+using System.Net;
 using System.Net.Sockets;
+using CoalNetLib.Internal;
 
 namespace CoalNetLib
 {
-    public class CoalServer
+    public class Server : NetBase
     {
-        private UdpClient _socket;
-        private FurnaceSerializer _serializer;
-        
-        /// <summary>
-        /// Create a new instance of the coal server
-        /// </summary>
-        public CoalServer()
+        public Server()
         {
-            
+            // Register internal packets
+            Serializer.RegisterType(typeof(PacketConnectionRequest));
         }
 
         /// <summary>
@@ -26,7 +23,13 @@ namespace CoalNetLib
         /// <param name="port"></param>
         public void Host(int port)
         {
-            _socket = new UdpClient(port);
+            StartListening(new UdpClient(port), port);
+        }
+
+        protected override void ProcessReceivedData(IPEndPoint sender, byte[] data)
+        {
+            object packet = Serializer.Deserialize(data);
+            // TODO connection 
         }
     }
 }

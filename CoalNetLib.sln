@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoalNetLib", "CoalNetLib\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoalNetLib.Sample", "CoalNetLib.Sample\CoalNetLib.Sample.csproj", "{195E6F21-5C8A-41B7-8BCA-0CD43D03E8F7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FurnaceSerializer", "FurnaceSerializer\FurnaceSerializer\FurnaceSerializer.csproj", "{C74EC869-DEB5-4A3D-9A31-726FF9C7BC7E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{195E6F21-5C8A-41B7-8BCA-0CD43D03E8F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{195E6F21-5C8A-41B7-8BCA-0CD43D03E8F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{195E6F21-5C8A-41B7-8BCA-0CD43D03E8F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C74EC869-DEB5-4A3D-9A31-726FF9C7BC7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C74EC869-DEB5-4A3D-9A31-726FF9C7BC7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C74EC869-DEB5-4A3D-9A31-726FF9C7BC7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C74EC869-DEB5-4A3D-9A31-726FF9C7BC7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

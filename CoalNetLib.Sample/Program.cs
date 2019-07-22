@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using CoalNetLib.Udp;
 
 namespace CoalNetLib.Sample
 {
@@ -10,9 +9,9 @@ namespace CoalNetLib.Sample
     {
         private static void Main(string[] args)
         {
-            var server = new CoalServer(new UdpListener());
+            var server = new Server();
             
-            server.Start(8000);
+            server.Host(8000);
 
             while (true)
             {
