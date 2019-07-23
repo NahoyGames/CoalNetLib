@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using CoalNetLib.Internal;
 using FurnaceSerializer;
 
 namespace CoalNetLib
@@ -11,8 +12,16 @@ namespace CoalNetLib
 
     public abstract class NetBase
     {
+        /// <summary>
+        /// The socket for this server/client
+        /// </summary>
         protected UdpClient Socket { get; private set; }
 
+        /// <summary>
+        /// The read/write buffer
+        /// </summary>
+        protected byte[] Buffer { get; private set; }
+        
         /// <summary>
         /// The port of this server/client
         /// </summary>
@@ -26,17 +35,17 @@ namespace CoalNetLib
         /// <summary>
         /// Methods subscribed to successful & accepted connections
         /// </summary>
-        protected event ConnectionHandler ConnectionListeners;
+        private event ConnectionHandler ConnectionListeners;
         
         /// <summary>
-        /// Methods subscribed to incoming packets
+        /// Methods subscribed to incoming packets from successful & accepted connections
         /// </summary>
-        protected event PacketReceivedHandler PacketListeners;
+        private event PacketReceivedHandler PacketListeners;
 
         /// <summary>
         /// Methods subscribed to disconnections of previously successful & accepted connections
         /// </summary>
-        protected event DisconnectionHandler DisconnectionListeners;
+        private event DisconnectionHandler DisconnectionListeners;
 
         /// <summary>
         /// Create a new instance of the coal server
@@ -44,6 +53,11 @@ namespace CoalNetLib
         protected NetBase()
         {
             Serializer = new Serializer();
+            
+            // Register internal packets
+            Serializer.RegisterType(typeof(PacketConnectionRequest));
+            Serializer.RegisterType(typeof(PacketConnectionRejected));
+            Serializer.RegisterType(typeof(PacketConnectionChallenge));
         }
 
         /// <summary>
@@ -60,6 +74,21 @@ namespace CoalNetLib
         /// Subscribe to disconnection events of previously successful & accepted connections
         /// </summary>
         public void Subscribe(DisconnectionHandler handler) => DisconnectionListeners += handler;
+
+        /// <summary>
+        /// Invoke new accepted & successful connection
+        /// </summary>
+        protected void InvokeConnection(Connection connection) => ConnectionListeners?.Invoke(connection);
+        
+        /// <summary>
+        /// Invoke packet listeners
+        /// </summary>
+        protected void InvokePacket(Connection sender, object packet) => PacketListeners?.Invoke(sender, packet);
+
+        /// <summary>
+        /// Invoke disconnection of previously accepted & successful connection
+        /// </summary>
+        protected void InvokeDisconnection(Connection connection) => DisconnectionListeners?.Invoke(connection);
         
         /// <summary>
         /// Start listening for incoming data
@@ -97,6 +126,13 @@ namespace CoalNetLib
         internal void Send(IPEndPoint receiver, byte[] data, int length)
         {
             Socket.Send(data, length, receiver);
+        }
+
+        internal void Send(IPEndPoint receiver, object value)
+        {
+            Serializer.Serialize(value, out int length, 0, Buffer);
+            
+            Send(receiver, Buffer, length);
         }
     }
 }

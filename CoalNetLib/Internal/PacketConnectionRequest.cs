@@ -2,8 +2,9 @@ using FurnaceSerializer;
 
 namespace CoalNetLib.Internal
 {
+    // client -> server
     internal struct PacketConnectionRequest
     {
-        // No data
+        [FurnaceSerializable] private long clientSalt;
     }
 }

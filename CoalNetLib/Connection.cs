@@ -10,7 +10,12 @@ namespace CoalNetLib
         /// <summary>
         /// The server issued identifier of this connection
         /// </summary>
-        public readonly int Id;
+        public readonly ushort Id;
+
+        /// <summary>
+        /// The randomly generated salt value for security
+        /// </summary>
+        public readonly long Salt;
         
         /// <summary>
         /// The IP address of this connection
@@ -25,7 +30,7 @@ namespace CoalNetLib
         /// <summary>
         /// Create a new connection
         /// </summary>
-        internal Connection(IPEndPoint ep, NetBase net, int id)
+        internal Connection(IPEndPoint ep, NetBase net, ushort id)
         {
             _net = net;
             EndPoint = ep;
@@ -38,6 +43,11 @@ namespace CoalNetLib
         public void Send(byte[] data, int length)
         {
             _net.Send(EndPoint, data, length);
+        }
+
+        public bool Equals(IPEndPoint other)
+        {
+            return other.Equals(EndPoint);
         }
 
         public bool Equals(Connection other)
