@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\ENet-CSharp\Source\Managed\ENet-CSharp.csproj" />
       <ProjectReference Include="..\FurnaceSerializer\FurnaceSerializer\FurnaceSerializer.csproj" />
     </ItemGroup>
 
