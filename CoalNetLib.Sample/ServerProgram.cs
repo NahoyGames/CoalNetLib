@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+
 namespace CoalNetLib.Sample
 {
     public class ServerProgram
@@ -7,6 +10,13 @@ namespace CoalNetLib.Sample
             var server = new Server();
             
             server.Start(5000);
+
+            while (!Console.KeyAvailable)
+            {
+                server.Update();
+                
+                Thread.Sleep(10);
+            }
         }
     }
 }
