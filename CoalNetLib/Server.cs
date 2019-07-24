@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ENet;
+using FurnaceSerializer;
 
 namespace CoalNetLib
 {
@@ -19,7 +20,40 @@ namespace CoalNetLib
         /// <summary>
         /// Seconds until timeout
         /// </summary>
-        public int Timeout { get; set; }= 15;
+        public int Timeout { get; set; } = 15;
+
+        /// <summary>
+        /// Maximum size in bytes received packets can be
+        /// </summary>
+        public uint MaxPacketSize
+        {
+            get => _maxPacketSize;
+            set
+            {
+                _maxPacketSize = value;
+                _socket.SetBandwidthLimit(MaxPacketSize, BufferSize);
+            }
+        }
+        private uint _maxPacketSize;
+
+        /// <summary>
+        /// Size in bytes of the write buffer
+        /// </summary>
+        public uint BufferSize
+        {
+            get => _bufferSize;
+            set
+            {
+                _bufferSize = value;
+                _socket.SetBandwidthLimit(MaxPacketSize, BufferSize);
+            }
+        }
+        private uint _bufferSize = 512;
+        
+        /// <summary>
+        /// The serializer for this server
+        /// </summary>
+        public Serializer Serializer { get; }
         
         /// <summary>
         /// ENet socket
@@ -30,6 +64,11 @@ namespace CoalNetLib
         /// Active connections
         /// </summary>
         private readonly IList<Connection> _connections;
+
+        /// <summary>
+        /// Write buffer
+        /// </summary>
+        private byte[] _buffer;
         
         /// <summary>
         /// Create a new server instance
@@ -40,6 +79,8 @@ namespace CoalNetLib
             
             _socket = new Host();
             _connections = new List<Connection>();
+            
+            Serializer = new Serializer();
         }
 
         /// <summary>
@@ -47,7 +88,16 @@ namespace CoalNetLib
         /// </summary>
         public void Start(ushort port, bool acceptConnections = true)
         {
-            _socket.Create(new Address { Port = port }, MaxConnections);
+            _socket.Create
+                (
+                    new Address { Port = port },
+                    MaxConnections,
+                    Enum.GetNames(typeof(Channel)).Length,
+                    MaxPacketSize,
+                    BufferSize
+                );
+            _buffer = new byte[BufferSize];
+            
             AcceptConnections = acceptConnections;
         }
 
@@ -95,9 +145,22 @@ namespace CoalNetLib
             }
         }
 
-        public void Send(Connection receiver, object packet)
+        /// <summary>
+        /// Send a packet to a given connection
+        /// </summary>
+        public void Send(Connection receiver, object packet, Channel channel = Channel.Unreliable)
         {
-            //receiver._peer.Send()
+            Serializer.Serialize(packet, out int length, 0, _buffer);
+            
+            var payload = new Packet();
+            payload.Create(_buffer, length, GetFlags(channel));
+
+            receiver._peer.Send((byte) channel, ref payload);
+        }
+
+        private PacketFlags GetFlags(Channel channel)
+        {
+            return channel == Channel.Reliable ? PacketFlags.Reliable : PacketFlags.None;
         }
 
         /// <summary>

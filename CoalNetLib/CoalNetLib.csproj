@@ -5,8 +5,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ENet-CSharp\Source\Managed\ENet-CSharp.csproj" />
       <ProjectReference Include="..\FurnaceSerializer\FurnaceSerializer\FurnaceSerializer.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="ENet-CSharp" Version="2.3.0" />
     </ItemGroup>
 
 </Project>
