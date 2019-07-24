@@ -4,11 +4,13 @@ namespace CoalNetLib
 {
     public class Connection
     {
-        internal Peer _peer;
+        public uint Id => Peer.ID;
+        
+        internal Peer Peer;
 
         public Connection(Peer peer)
         {
-            _peer = peer;
+            Peer = peer;
         }
     }
 }

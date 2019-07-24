@@ -5,6 +5,7 @@ namespace CoalNetLib
         Default,
         Timeout,
         Kicked,
-        ConnectionClosed
+        ConnectionClosed,
+        ServerClosed
     }
 }

@@ -161,6 +161,30 @@ namespace CoalNetLib
         }
 
         /// <summary>
+        /// Stop the server
+        /// </summary>
+        public void Stop()
+        {
+            foreach (var connection in _connections)
+            {
+                Disconnect(connection, DisconnectReason.ServerClosed);
+            }
+            _socket.Dispose();
+        }
+
+        /// <summary>
+        /// Disconnect a client and remove its connection
+        /// </summary>
+        public void Disconnect(Connection connection, DisconnectReason reason)
+        {
+            if (connection != null)
+            {
+                connection.Peer.Disconnect(0);
+                _connections[connection.Id] = null;
+            }
+        }
+
+        /// <summary>
         /// Notify connect listeners
         /// </summary>
         private void InvokeConnect(Peer peer)
@@ -200,7 +224,7 @@ namespace CoalNetLib
         {
             var payload = GetPacket(packet, channel);
 
-            receiver._peer.Send((byte) channel, ref payload);
+            receiver.Peer.Send((byte) channel, ref payload);
         }
 
         /// <summary>
@@ -219,7 +243,7 @@ namespace CoalNetLib
                 var peers = new Peer[exclude.Length];
                 for (int i = 0; i < peers.Length; i++)
                 {
-                    peers[i] = exclude[i]._peer;
+                    peers[i] = exclude[i].Peer;
                 }
                 _socket.Broadcast((byte) channel, ref payload, peers);
             }
