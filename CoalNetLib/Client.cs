@@ -30,7 +30,7 @@ namespace CoalNetLib
             
             Socket.Create();
 
-            _server = new Connection(Socket.Connect(address));
+            _server = new Connection(Socket.Connect(address, Enum.GetNames(typeof(Channel)).Length));
             
             WriteBuffer = new byte[MaxOutgoingPacketSize];
             ReadBuffer = new byte[MaxIncomingPacketSize];

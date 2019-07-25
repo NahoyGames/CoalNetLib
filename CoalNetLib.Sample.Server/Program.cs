@@ -26,7 +26,8 @@ namespace CoalNetLib.Sample.Server
                     switch (key)
                     {
                         case ConsoleKey.A:
-                            server.Send(new PacketMessage("Hello clients!"));
+                            //server.GetConnection()
+                            server.Send(server.GetConnection(0), new PacketMessage("Hello clients!"));
                             break;
                         default:
                             server.Stop();
