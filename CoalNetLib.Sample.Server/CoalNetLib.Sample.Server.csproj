@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\CoalNetLib.Sample.Common\CoalNetLib.Sample.Common.csproj" />
       <ProjectReference Include="..\CoalNetLib\CoalNetLib.csproj" />
     </ItemGroup>
 

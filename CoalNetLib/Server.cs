@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
 using ENet;
-using FurnaceSerializer;
 
 namespace CoalNetLib
 {
-    public class Server
+    public class Server : NetBase
     {
         /// <summary>
         /// Maximum number of connections at a time
@@ -36,75 +34,10 @@ namespace CoalNetLib
         public bool Started { get; private set; } = false;
         
         /// <summary>
-        /// Seconds until timeout
-        /// </summary>
-        public int Timeout { get; set; } = 15;
-
-        /// <summary>
-        /// Maximum size in bytes received packets can be
-        /// </summary>
-        public uint MaxIncomingPacketSize
-        {
-            get => _maxIncomingPacketSize;
-            set
-            {
-                _maxIncomingPacketSize = value;
-                _socket.SetBandwidthLimit(MaxIncomingPacketSize, MaxOutgoingPacketSize);
-            }
-        }
-        private uint _maxIncomingPacketSize = 256;
-
-        /// <summary>
-        /// Maximum size in bytes outgoing packets can be
-        /// </summary>
-        public uint MaxOutgoingPacketSize
-        {
-            get => _maxOutgoingPacketSize;
-            set
-            {
-                _maxOutgoingPacketSize = value;
-                _socket.SetBandwidthLimit(MaxIncomingPacketSize, MaxOutgoingPacketSize);
-            }
-        }
-        private uint _maxOutgoingPacketSize = 512;
-        
-        /// <summary>
-        /// The serializer for this server
-        /// </summary>
-        public Serializer Serializer { get; }
-        
-        /// <summary>
-        /// ENet socket
-        /// </summary>
-        private readonly Host _socket;
-
-        /// <summary>
         /// Active connections
         /// </summary>
         private Connection[] _connections;
-
-        /// <summary>
-        /// Write buffer
-        /// </summary>
-        private byte[] _writeBuffer;
-
-        /// <summary>
-        /// Read buffer
-        /// </summary>
-        private byte[] _readBuffer;
         
-        /// <summary>
-        /// Create a new server instance
-        /// </summary>
-        public Server()
-        {
-            Library.Initialize(); // Init ENet
-            
-            _socket = new Host();
-            
-            Serializer = new Serializer();
-        }
-
         /// <summary>
         /// Start the server & listen for incoming connections
         /// </summary>
@@ -112,7 +45,7 @@ namespace CoalNetLib
         {
             _connections = new Connection[MaxConnections];
             
-            _socket.Create
+            Socket.Create
                 (
                     new Address { Port = port },
                     MaxConnections,
@@ -121,43 +54,11 @@ namespace CoalNetLib
                     MaxOutgoingPacketSize
                 );
             
-            _writeBuffer = new byte[MaxOutgoingPacketSize];
-            _readBuffer = new byte[MaxIncomingPacketSize];
+            WriteBuffer = new byte[MaxOutgoingPacketSize];
+            ReadBuffer = new byte[MaxIncomingPacketSize];
             
             AcceptConnections = acceptConnections;
             Started = true;
-        }
-
-        /// <summary>
-        /// Poll events & notify listeners
-        /// </summary>
-        public void Update()
-        {
-            var polled = false;
-
-            while (!polled)
-            {
-                if (_socket.CheckEvents(out Event @event) <= 0)
-                {
-                    if (_socket.Service(Timeout, out @event) <= 0) { break; }
-
-                    polled = true;
-                }
-
-                switch (@event.Type)
-                {
-                    case EventType.None:
-                        break;
-                    case EventType.Connect: InvokeConnect(@event.Peer);
-                        break;
-                    case EventType.Disconnect: InvokeDisconnect(@event.Peer, DisconnectReason.Default);
-                        break;
-                    case EventType.Receive: InvokePacket(@event.Peer, @event.Packet);
-                        break;
-                    case EventType.Timeout: InvokeDisconnect(@event.Peer, DisconnectReason.Timeout);
-                        break;
-                }
-            }
         }
 
         /// <summary>
@@ -169,7 +70,7 @@ namespace CoalNetLib
             {
                 Disconnect(connection, DisconnectReason.ServerClosed);
             }
-            _socket.Dispose();
+            Socket.Dispose();
         }
 
         /// <summary>
@@ -183,11 +84,8 @@ namespace CoalNetLib
                 _connections[connection.Id] = null;
             }
         }
-
-        /// <summary>
-        /// Notify connect listeners
-        /// </summary>
-        private void InvokeConnect(Peer peer)
+        
+        protected override void InvokeConnect(Peer peer)
         {
             if (AcceptConnections)
             {
@@ -196,23 +94,18 @@ namespace CoalNetLib
             }
             else
             {
-                peer.Disconnect((ushort)DisconnectReason.ConnectionClosed);
+                peer.Disconnect(0); // (ushort)DisconnectReason.ConnectionClosed
             }
         }
-
-        /// <summary>
-        /// Notify packet listeners
-        /// </summary>
-        private void InvokePacket(Peer sender, Packet packet)
+        
+        protected override void InvokePacket(Peer sender, Packet packet)
         {
-            packet.CopyTo(_readBuffer);
-            PacketListeners?.Invoke(GetConnection(sender), Serializer.Deserialize(_readBuffer));
+            packet.CopyTo(ReadBuffer);
+            PacketListeners?.Invoke(GetConnection(sender), Serializer.Deserialize(ReadBuffer));
+            packet.Dispose();
         }
-
-        /// <summary>
-        /// Notify disconnect listeners
-        /// </summary>
-        private void InvokeDisconnect(Peer peer, DisconnectReason reason)
+        
+        protected override void InvokeDisconnect(Peer peer, DisconnectReason reason)
         {
             DisconnectListeners?.Invoke(GetConnection(peer), reason);
         }
@@ -236,7 +129,7 @@ namespace CoalNetLib
 
             if (exclude == null)
             {
-                _socket.Broadcast((byte) channel, ref payload);
+                Socket.Broadcast((byte) channel, ref payload);
             }
             else
             {
@@ -245,7 +138,7 @@ namespace CoalNetLib
                 {
                     peers[i] = exclude[i].Peer;
                 }
-                _socket.Broadcast((byte) channel, ref payload, peers);
+                Socket.Broadcast((byte) channel, ref payload, peers);
             }
         }
 
@@ -260,53 +153,18 @@ namespace CoalNetLib
         internal Connection GetConnection(Peer peer) => GetConnection(peer.ID);
 
         /// <summary>
-        /// Generate an ENet packet from CoalNetLib packet args
-        /// </summary>
-        private Packet GetPacket(object packet, Channel channel)
-        {
-            Serializer.Serialize(packet, out int length, 0, _writeBuffer);
-            
-            var payload = new Packet();
-            payload.Create(_writeBuffer, length, GetFlags(channel));
-
-            return payload;
-        }
-
-        /// <summary>
-        /// Get the flags for the GetPacket() method
-        /// </summary>
-        private PacketFlags GetFlags(Channel channel)
-        {
-            return channel == Channel.Reliable ? PacketFlags.Reliable : PacketFlags.None;
-        }
-
-        /// <summary>
         /// Methods listening for connections
         /// </summary>
-        public event ConnectHandler ConnectListeners;
-        public delegate void ConnectHandler(Connection connection);
+        public event Action<Connection> ConnectListeners;
         
         /// <summary>
         /// Methods listening for incoming packets
         /// </summary>
-        public event ReceivePacketHandler PacketListeners;
-        public delegate void ReceivePacketHandler(Connection sender, object packet);
+        public event Action<Connection, object> PacketListeners;
 
         /// <summary>
         /// Methods listening for disconnections
         /// </summary>
-        public event DisconnectHandler DisconnectListeners;
-        public delegate void DisconnectHandler(Connection connection, DisconnectReason reason);
-        
-        /// <summary>
-        /// Deconstructor cleanup
-        /// </summary>
-        ~Server()
-        {
-            _socket?.Flush();
-            _socket?.Dispose();
-            
-            Library.Deinitialize(); // De-Init UNet
-        }
+        public event Action<Connection, DisconnectReason> DisconnectListeners;
     }
 }

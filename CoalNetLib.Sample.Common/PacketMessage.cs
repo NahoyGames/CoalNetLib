@@ -1,6 +1,6 @@
 using FurnaceSerializer;
 
-namespace CoalNetLib.Sample
+namespace CoalNetLib.Sample.Common
 {
     public struct PacketMessage
     {

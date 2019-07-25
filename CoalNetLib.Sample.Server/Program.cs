@@ -1,17 +1,22 @@
-using System;
+﻿using System;
 using System.Threading;
+using CoalNetLib.Sample.Common;
 
-namespace CoalNetLib.Sample
+namespace CoalNetLib.Sample.Server
 {
-    public class ServerProgram
+    class Program
     {
         public static void Main(string[] args)
         {
-            var server = new Server();
+            Console.WriteLine("Started @ " + DateTime.Now);
+            
+            var server = new CoalNetLib.Server();
             
             server.Start(5000);
             server.Serializer.RegisterType(typeof(PacketMessage));
 
+            server.ConnectListeners += connection => Console.WriteLine("Got a connection! " + connection.Id);
+            
             while (true)
             {
                 if (Console.KeyAvailable)
