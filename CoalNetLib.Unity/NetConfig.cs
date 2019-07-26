@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace CoalNetLib.Unity
 {
+    [CreateAssetMenu(fileName = "New Network Configuration", menuName = "CoalNetLib/NetConfig")]
     public class NetConfig : ScriptableObject
     {
         /// <summary>
