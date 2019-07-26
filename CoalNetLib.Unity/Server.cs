@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace CoalNetLib.Unity
@@ -8,7 +9,7 @@ namespace CoalNetLib.Unity
         [SerializeField] private NetConfig config;
 
         private CoalNetLib.Server _server;
-        
+
         private void Awake()
         {
             Instance = this;
@@ -30,6 +31,10 @@ namespace CoalNetLib.Unity
             }
 
             _server.Start(config.Port);
+            
+            // Networked Object
+            _nextId = 0;
+            _recycledId = new Queue<ushort>();
         }
 
         private void Update()
@@ -46,7 +51,7 @@ namespace CoalNetLib.Unity
         /// The latest running instance of the server
         /// </summary>
         public static Server Instance { get; private set; }
-        
+
         /// <summary>
         /// Accept new incoming connections?
         /// </summary>
@@ -96,5 +101,22 @@ namespace CoalNetLib.Unity
         /// Subscribe a method be a connection listener
         /// </summary>
         public void Subscribe(Action<Connection, DisconnectReason> method) => _server.DisconnectListeners += method;
+        
+        /* Networked Objects */
+        private ushort _nextId = 0;
+        private Queue<ushort> _recycledId;
+        
+        /// <summary>
+        /// Get the next net object ID
+        /// </summary>
+        public ushort GetNextId()
+        {
+            return _recycledId.Count <= 0 ? _nextId++ : _recycledId.Dequeue();
+        }
+
+        /// <summary>
+        /// Make an ID available for a new net object
+        /// </summary>
+        public void RecycleId(ushort id) => _recycledId.Enqueue(id);
     }
 }
