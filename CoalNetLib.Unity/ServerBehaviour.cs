@@ -16,7 +16,11 @@ namespace CoalNetLib.Unity
             Server.Instance.Subscribe(OnConnection);
             Server.Instance.Subscribe((Action<Connection, object>) OnPacket);
             Server.Instance.Subscribe(OnDisconnection);
+
+            Identity = GetComponent<NetIdentity>();
         }
+        
+        public NetIdentity Identity { get; private set; }
         
         protected virtual void OnConnection(Connection connection) { }
         
