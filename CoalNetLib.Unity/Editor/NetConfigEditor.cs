@@ -39,7 +39,7 @@ namespace CoalNetLib.Unity.Editor
             EditorGUILayout.PropertyField(_clientMaxPacketSize);
             
             EditorGUILayout.LabelField("Packets", EditorStyles.boldLabel);
-            EditorGUILayout.Foldout(_packetScriptsShow, "");
+            _packetScriptsShow = EditorGUILayout.Foldout(_packetScriptsShow, "");
             if (_packetScriptsShow)
             {
                 for (int i = 0; i < _packetScripts.arraySize; i++)
