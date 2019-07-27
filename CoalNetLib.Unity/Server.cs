@@ -20,12 +20,7 @@ namespace CoalNetLib.Unity
             Application.targetFrameRate = config.UpdateRate;
 
             _server = new CoalNetLib.Server();
-            
-            _server.MaxConnections = config.MaxConnections;
-            _server.MaxOutgoingPacketSize = config.ServerMaxPacketSize;
-            _server.MaxIncomingPacketSize = config.ClientMaxPacketSize;
-            _server.Timeout = config.Timeout;
-            
+
             _server.Serializer.RegisterSerializer(new QuaternionSerializer());
             _server.Serializer.RegisterSerializer(new Vector2Serializer());
             _server.Serializer.RegisterSerializer(new Vector3Serializer());
@@ -37,6 +32,11 @@ namespace CoalNetLib.Unity
             }
             
             _server.Start(config.Port);
+            
+            _server.MaxConnections = config.MaxConnections;
+            _server.MaxOutgoingPacketSize = config.ServerMaxPacketSize;
+            _server.MaxIncomingPacketSize = config.ClientMaxPacketSize;
+            _server.Timeout = config.Timeout;
             
             // Networked Object
             _nextId = 0;

@@ -23,10 +23,6 @@ namespace CoalNetLib.Unity
 
             _client = new CoalNetLib.Client();
 
-            _client.Timeout = config.Timeout;
-            _client.MaxIncomingPacketSize = config.ServerMaxPacketSize;
-            _client.MaxOutgoingPacketSize = config.ClientMaxPacketSize;
-            
             _client.Serializer.RegisterSerializer(new QuaternionSerializer());
             _client.Serializer.RegisterSerializer(new Vector2Serializer());
             _client.Serializer.RegisterSerializer(new Vector3Serializer());
@@ -67,12 +63,19 @@ namespace CoalNetLib.Unity
         /// Connect to a runtime-provided ip
         /// </summary>
         public void Connect(string ip) => Connect(ip, config.Port);
-        
+
         /// <summary>
         /// Connect to a runtime-provided ip & port
         /// </summary>
-        public void Connect(string ip, ushort port) => _client.Connect(ip, port);
-        
+        public void Connect(string ip, ushort port)
+        {
+            _client.Connect(ip, port);
+            
+            _client.Timeout = config.Timeout;
+            _client.MaxIncomingPacketSize = config.ServerMaxPacketSize;
+            _client.MaxOutgoingPacketSize = config.ClientMaxPacketSize;
+        }
+
         /// <summary>
         /// Disconnect from the server
         /// </summary>
