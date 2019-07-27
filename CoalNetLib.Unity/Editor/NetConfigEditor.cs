@@ -7,23 +7,20 @@ namespace CoalNetLib.Unity.Editor
     [CustomEditor(typeof(NetConfig))]
     public class NetConfigEditor : UnityEditor.Editor
     {
-        private SerializedProperty _port, _timeout, _serializers, _packetScripts,
+        private SerializedProperty _port, _timeout, _packetScripts,
             _maxConnections, _updateRate, _serverMaxPacketSize, _clientMaxPacketSize;
 
-        private Vector2 _packetScriptsScroll;
+        private bool _packetScriptsShow = false;
         
         private void OnEnable()
         {
             _port = serializedObject.FindProperty("port");
             _timeout = serializedObject.FindProperty("timeout");
-            _serializers = serializedObject.FindProperty("serializers");
             _packetScripts = serializedObject.FindProperty("packetScripts");
             _maxConnections = serializedObject.FindProperty("maxConnections");
             _updateRate = serializedObject.FindProperty("updateRate");
             _serverMaxPacketSize = serializedObject.FindProperty("serverMaxPacketSize");
             _clientMaxPacketSize = serializedObject.FindProperty("clientMaxPacketSize");
-            
-            _packetScriptsScroll = new Vector2();
         }
 
         public override void OnInspectorGUI()
@@ -42,23 +39,25 @@ namespace CoalNetLib.Unity.Editor
             EditorGUILayout.PropertyField(_clientMaxPacketSize);
             
             EditorGUILayout.LabelField("Packets", EditorStyles.boldLabel);
-            EditorGUILayout.BeginScrollView(_packetScriptsScroll);
-            for (int i = 0; i < _packetScripts.arraySize; i++)
+            EditorGUILayout.Foldout(_packetScriptsShow, "");
+            if (_packetScriptsShow)
             {
-                EditorGUILayout.PropertyField(_packetScripts.GetArrayElementAtIndex(i));
-            }
-            EditorGUILayout.EndScrollView();
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("+"))
-            {
-                _packetScripts.arraySize++;
-            }
+                for (int i = 0; i < _packetScripts.arraySize; i++)
+                {
+                    EditorGUILayout.PropertyField(_packetScripts.GetArrayElementAtIndex(i));
+                }
 
-            if (GUILayout.Button("-"))
-            {
-                _packetScripts.arraySize--;
+                EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button("+"))
+                {
+                    _packetScripts.arraySize++;
+                }
+                if (GUILayout.Button("-"))
+                {
+                    _packetScripts.arraySize--;
+                }
+                EditorGUILayout.EndHorizontal();
             }
-            EditorGUILayout.EndHorizontal();
             
             serializedObject.ApplyModifiedProperties();
         }

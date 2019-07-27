@@ -21,12 +21,6 @@ namespace CoalNetLib.Unity
         [SerializeField] private int timeout;
 
         /// <summary>
-        /// Registered serializers
-        /// </summary>
-        public ISerializer[] Serializers => serializers;
-        [SerializeField] private ISerializer[] serializers;
-        
-        /// <summary>
         /// Array of registered packets
         /// </summary>
         public Type[] Packets

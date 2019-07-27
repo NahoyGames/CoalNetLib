@@ -31,10 +31,6 @@ namespace CoalNetLib.Unity
             _server.Serializer.RegisterSerializer(new Vector3Serializer());
             _server.Serializer.RegisterSerializer(new Vector4Serializer());
             
-            foreach (var serializer in config.Serializers)
-            {
-                _server.Serializer.RegisterSerializer(serializer);
-            }
             foreach (var packet in config.Packets)
             {
                 _server.Serializer.RegisterType(packet);
