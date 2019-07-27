@@ -41,13 +41,24 @@ namespace CoalNetLib.Unity.Editor
             EditorGUILayout.LabelField("Client", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(_clientMaxPacketSize);
             
-            EditorGUILayout.LabelField("Packets");
+            EditorGUILayout.LabelField("Packets", EditorStyles.boldLabel);
             EditorGUILayout.BeginScrollView(_packetScriptsScroll);
             for (int i = 0; i < _packetScripts.arraySize; i++)
             {
                 EditorGUILayout.PropertyField(_packetScripts.GetArrayElementAtIndex(i));
             }
             EditorGUILayout.EndScrollView();
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("+"))
+            {
+                _packetScripts.arraySize++;
+            }
+
+            if (GUILayout.Button("-"))
+            {
+                _packetScripts.arraySize--;
+            }
+            EditorGUILayout.EndHorizontal();
             
             serializedObject.ApplyModifiedProperties();
         }
