@@ -1,5 +1,6 @@
 using System;
 using FurnaceSerializer;
+using UnityEditor;
 using UnityEngine;
 
 namespace CoalNetLib.Unity
@@ -28,9 +29,21 @@ namespace CoalNetLib.Unity
         /// <summary>
         /// Array of registered packets
         /// </summary>
-        public Type[] Packets => packets;
-        [SerializeField] private Type[] packets;
-        
+        public Type[] Packets
+        {
+            get
+            {
+                var arr = new Type[packetScripts.Length];
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    arr[i] = packetScripts[i].GetClass();
+                }
+
+                return arr;
+            }
+        }
+        [SerializeField] private MonoScript[] packetScripts;
+
         /// <summary>
         /// Maximum number of connections on the server at a time
         /// </summary>
