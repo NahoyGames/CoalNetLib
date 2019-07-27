@@ -1,4 +1,5 @@
 using System;
+using FurnaceSerializer;
 using UnityEngine;
 
 namespace CoalNetLib.Unity
@@ -18,6 +19,12 @@ namespace CoalNetLib.Unity
         public int Timeout => timeout;
         [SerializeField] private int timeout;
 
+        /// <summary>
+        /// Registered serializers
+        /// </summary>
+        public ISerializer[] Serializers => serializers;
+        [SerializeField] private ISerializer[] serializers;
+        
         /// <summary>
         /// Array of registered packets
         /// </summary>

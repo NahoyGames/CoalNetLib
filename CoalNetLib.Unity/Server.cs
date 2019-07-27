@@ -25,11 +25,15 @@ namespace CoalNetLib.Unity
                 MaxIncomingPacketSize = config.ClientMaxPacketSize,
                 Timeout = config.Timeout
             };
+            foreach (var serializer in config.Serializers)
+            {
+                _server.Serializer.RegisterSerializer(serializer);
+            }
             foreach (var packet in config.Packets)
             {
                 _server.Serializer.RegisterType(packet);
             }
-
+            
             _server.Start(config.Port);
             
             // Networked Object

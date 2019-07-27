@@ -26,6 +26,10 @@ namespace CoalNetLib.Unity
                 MaxIncomingPacketSize = config.ServerMaxPacketSize,
                 MaxOutgoingPacketSize = config.ClientMaxPacketSize
             };
+            foreach (var serializer in config.Serializers)
+            {
+                _client.Serializer.RegisterSerializer(serializer);
+            }
             foreach (var packet in config.Packets)
             {
                 _client.Serializer.RegisterType(packet);
