@@ -1,4 +1,5 @@
 using System;
+using CoalNetLib.Unity.Serializers;
 using UnityEngine;
 
 namespace CoalNetLib.Unity
@@ -26,6 +27,11 @@ namespace CoalNetLib.Unity
                 MaxIncomingPacketSize = config.ServerMaxPacketSize,
                 MaxOutgoingPacketSize = config.ClientMaxPacketSize
             };
+            _client.Serializer.RegisterSerializer(new QuaternionSerializer());
+            _client.Serializer.RegisterSerializer(new Vector2Serializer());
+            _client.Serializer.RegisterSerializer(new Vector3Serializer());
+            _client.Serializer.RegisterSerializer(new Vector4Serializer());
+
             foreach (var serializer in config.Serializers)
             {
                 _client.Serializer.RegisterSerializer(serializer);
