@@ -21,12 +21,12 @@ namespace CoalNetLib.Unity
             Application.runInBackground = true;
             Application.targetFrameRate = config.UpdateRate;
 
-            _client = new CoalNetLib.Client()
-            {
-                Timeout = config.Timeout,
-                MaxIncomingPacketSize = config.ServerMaxPacketSize,
-                MaxOutgoingPacketSize = config.ClientMaxPacketSize
-            };
+            _client = new CoalNetLib.Client();
+
+            _client.Timeout = config.Timeout;
+            _client.MaxIncomingPacketSize = config.ServerMaxPacketSize;
+            _client.MaxOutgoingPacketSize = config.ClientMaxPacketSize;
+            
             _client.Serializer.RegisterSerializer(new QuaternionSerializer());
             _client.Serializer.RegisterSerializer(new Vector2Serializer());
             _client.Serializer.RegisterSerializer(new Vector3Serializer());
