@@ -26,6 +26,11 @@ namespace CoalNetLib.Unity
         {
             Server.Instance.Send(receiver, packet, channel);
         }
+
+        protected void SendPacket(object packet, Channel channel = Channel.Unreliable)
+        {
+            Server.Instance.Send(packet, channel);
+        }
         
         protected virtual void OnConnection(Connection connection) { }
         
