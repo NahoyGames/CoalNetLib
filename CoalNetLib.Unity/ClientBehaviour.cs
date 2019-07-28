@@ -21,6 +21,11 @@ namespace CoalNetLib.Unity
         
         public NetIdentity Identity { get; private set; }
 
+        protected void SendPacket(object packet, Channel channel = Channel.Unreliable)
+        {
+            Client.Instance.Send(packet, channel);
+        }
+        
         protected virtual void OnConnected() { }
         
         protected virtual void OnPacket(object packet) { }
