@@ -18,6 +18,8 @@ namespace CoalNetLib.Unity.Editor
         {
             base.OnInspectorGUI();
 
+            if (!EditorApplication.isPlaying) return;
+            
             if (!_client.Connected)
             {
                 if (GUILayout.Button("Connect"))
