@@ -69,9 +69,10 @@ namespace CoalNetLib.Unity
         /// </summary>
         public void Connect(string ip, ushort port)
         {
+            _client.Timeout = config.Timeout;
+
             _client.Connect(ip, port);
             
-            _client.Timeout = config.Timeout;
             _client.MaxIncomingPacketSize = config.ServerMaxPacketSize;
             _client.MaxOutgoingPacketSize = config.ClientMaxPacketSize;
         }
